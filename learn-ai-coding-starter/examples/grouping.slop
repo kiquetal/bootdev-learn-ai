@@ -1,0 +1,2 @@
+— Grouping overrides precedence: (1 + 2) * 3 = 9.
+hallucinate((1 + 2) * 3)✨
