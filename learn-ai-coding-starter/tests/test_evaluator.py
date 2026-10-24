@@ -109,6 +109,65 @@ hallucinate(n)✨"""
     assert run(source) == "105\n1\n"
 
 
+def test_loadbearing_constants_are_readable_and_variables_stay_mutable():
+    source = """loadbearing LIMIT = 100✨
+slop score = 10✨
+score = score + 1✨
+hallucinate(score)✨
+hallucinate(LIMIT)✨"""
+    assert run(source) == "11\n100\n"
+
+
+def test_assigning_to_loadbearing_is_a_runtime_error():
+    result = run_source("loadbearing LIMIT = 100✨\nLIMIT = 200✨")
+    assert result.exit_code == 1
+    assert result.stderr == (
+        "SlopLang runtime error at line 2: cannot assign to loadbearing 'LIMIT'\n"
+    )
+
+
+def test_inner_slop_shadows_an_outer_loadbearing():
+    source = """loadbearing X = 1✨
+hallucinate(X)✨
+{
+    slop X = 2✨
+    X = 3✨
+    hallucinate(X)✨
+}
+hallucinate(X)✨"""
+    assert run(source) == "1\n3\n1\n"
+
+
+def test_loadbearing_may_shadow_an_outer_binding():
+    source = """slop X = 1✨
+{
+    loadbearing X = 2✨
+    hallucinate(X)✨
+}
+hallucinate(X)✨"""
+    assert run(source) == "2\n1\n"
+
+
+def test_parameters_may_shadow_loadbearing_constants():
+    source = """loadbearing X = 1✨
+clanker f(X) {
+    ship X✨
+}
+hallucinate(f(2))✨
+hallucinate(X)✨"""
+    assert run(source) == "2\n1\n"
+
+
+def test_constant_in_a_loop_body_is_declared_each_iteration():
+    source = """slop i = 0✨
+ralph i < 2 {
+    loadbearing X = 1✨
+    hallucinate(X)✨
+    i = i + 1✨
+}"""
+    assert run(source) == "1\n1\n"
+
+
 def test_ship_unwinds_nested_blocks_and_loops():
     source = """clanker find() {
     slop i = 0✨
