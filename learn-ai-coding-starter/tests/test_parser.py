@@ -64,6 +64,50 @@ def test_slop_declaration():
     assert isinstance(declaration, VarDecl) and declaration.mutable
 
 
+def test_loadbearing_declaration_is_immutable():
+    (declaration,) = parse_source("loadbearing LIMIT = 100✨")
+    assert isinstance(declaration, VarDecl) and not declaration.mutable
+    assert isinstance(declaration.initializer, Literal)
+    assert declaration.initializer.value == 100
+
+
+@pytest.mark.parametrize(
+    ("source", "value"),
+    [
+        ("loadbearing NUMBER = 1✨", 1),
+        ("loadbearing STRING = “slop”✨", "slop"),
+        ("loadbearing TRUE = ✅✨", True),
+        ("loadbearing FALSE = ❌✨", False),
+    ],
+)
+def test_loadbearing_initializer_is_a_single_literal(source: str, value: int | str | bool):
+    (declaration,) = parse_source(source)
+    assert isinstance(declaration, VarDecl)
+    assert isinstance(declaration.initializer, Literal)
+    assert declaration.initializer.value == value
+
+
+@pytest.mark.parametrize(
+    ("initializer", "found"),
+    [
+        ("-1", "-"),
+        ("(1)", "("),
+        ("other", "other"),
+        ("compute()", "compute"),
+    ],
+)
+def test_loadbearing_rejects_non_literal_initializers(initializer: str, found: str):
+    with pytest.raises(SlopSyntaxError) as info:
+        parse_source(f"loadbearing X = {initializer}✨")
+    assert info.value.message == f"loadbearing initializer must be a literal, found '{found}'"
+
+
+def test_loadbearing_rejects_expression_initializers():
+    with pytest.raises(SlopSyntaxError) as info:
+        parse_source("loadbearing X = 1 + 1✨")
+    assert info.value.message == "expected ✨ after variable declaration, found '+'"
+
+
 def test_control_flow_shapes():
     (conditional, loop) = parse_source("vibe ✅ { } nah { } ralph ❌ { }")
     assert isinstance(conditional, If) and conditional.else_branch is not None
