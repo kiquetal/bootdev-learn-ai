@@ -38,6 +38,7 @@ Prints `small slop` twice, then `big slop`.
 | SlopLang      | Conventional | Meaning                                                 |
 | ------------- | ------------ | ------------------------------------------------------- |
 | `slop`        | `let`        | Declare a mutable variable                              |
+| `loadbearing` | `const`      | Declare an immutable constant                           |
 | `clanker`     | `fn`         | Define a function                                       |
 | `vibe`        | `if`         | Conditional                                             |
 | `nah`         | `else`       | Else branch                                             |
@@ -74,16 +75,26 @@ No implicit conversions.
 
 ### Variables
 
-`slop` declares a mutable variable and requires an initializer. A scope cannot declare a name twice, but an inner block may shadow an outer name.
+`slop` declares a mutable variable and `loadbearing` declares an immutable constant. Both require an initializer. A name cannot be redeclared in the same scope, but an inner block may shadow an outer name.
 
 ```slop
+loadbearing LIMIT = 100✨
 slop score = 10✨
-slop LIMIT = 100✨
-score = score + 5✨
+
+— allowed
 score = score + 1✨
+
+— not allowed: runtime error
+LIMIT = 200✨
 ```
 
-Assignment is a statement, not an expression: `name = expression✨`. It updates the nearest existing `slop` variable. Reading or assigning an undefined name is a runtime error.
+A `loadbearing` initializer must be a single literal: a number, a string, `✅`, or `❌`. Expressions, calls, grouping, and a leading `-` are syntax errors.
+
+Assignment is a statement, not an expression: `name = expression✨`. It updates the nearest mutable `slop` variable. Assigning to a constant is a runtime error (`cannot assign to loadbearing 'LIMIT'`). Reading or assigning an undefined name is a runtime error.
+
+Every brace block is a lexical scope. Assignment searches the current scope, then each enclosing scope.
+
+Only redeclaring a name in the same scope is an error. An inner `slop`, `loadbearing`, or parameter may shadow an outer binding, including a `loadbearing` constant; the outer binding keeps its value.
 
 Every brace block is a lexical scope. Assignment searches the current scope, then each enclosing scope.
 

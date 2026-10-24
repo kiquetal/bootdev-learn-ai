@@ -1,0 +1,10 @@
+— loadbearing declares an immutable constant; slop stays mutable.
+loadbearing LIMIT = 100✨
+loadbearing GREETING = “hi”✨
+
+slop score = 10✨
+score = score + 1✨
+
+hallucinate(GREETING)✨
+hallucinate(score)✨
+hallucinate(LIMIT)✨
