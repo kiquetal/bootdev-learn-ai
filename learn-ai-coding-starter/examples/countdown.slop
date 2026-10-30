@@ -1,0 +1,6 @@
+slop n = 3✨
+ralph n > 0 {
+    hallucinate(n)✨
+    n = n - 1✨
+}
+hallucinate(“liftoff”)✨
