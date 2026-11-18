@@ -1,6 +1,17 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "opencode/deepseek-v4.1-flash-free",
+  "model": "google/gemini-3.5-flash-lite",
+  "providers": {
+    "google": {
+      "models": {
+        "gemini-3.5-flash-lite": {
+          "settings": {
+            "temperature": 0.1
+          }
+        }
+      }
+    }
+  },
   "permissions": [
     // Shell commands require approval; the specific rules below are allowed.
     { "action": "shell", "resource": "*", "effect": "ask" },
