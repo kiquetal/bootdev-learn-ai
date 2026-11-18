@@ -1,6 +1,7 @@
 ---
 description: Reviews code changes for correctness and regressions without modifying files
 mode: primary
+steps: 2
 permissions:
   - action: "*"
     resource: "*"
