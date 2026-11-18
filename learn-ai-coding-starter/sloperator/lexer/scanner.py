@@ -75,7 +75,8 @@ class Scanner:
         if ch == "—":
             while not self.at_end() and self.peek() != "\n":
                 self.advance()
-            self.match("\n")
+            if self.match("\n"):
+                self.line += 1
             return
         if ch == "/" and self.match("/"):
             raise LexicalError(self.line, "comments start with an em dash (—), not //")
