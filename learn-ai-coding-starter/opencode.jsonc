@@ -18,6 +18,8 @@
     // Boot.dev lessons are run with this CLI command.
     { "action": "shell", "resource": "bootdev run *", "effect": "allow" },
     // The run_slop plugin tool executes SlopLang programs with Sloperator.
-    { "action": "run_slop", "resource": "*", "effect": "allow" }
+    { "action": "run_slop", "resource": "*", "effect": "allow" },
+    // The explore subagent is not permitted in this project.
+    { "action": "subagent", "resource": "explore", "effect": "deny" }
   ]
 }
